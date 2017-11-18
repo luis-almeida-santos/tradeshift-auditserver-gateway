@@ -24,12 +24,12 @@ public class AMPQConfiguration {
     private final AuditServerGatewayProperties apiserverProperties;
 
     @Bean
-    public Queue queue() {
+    public Queue auditserverQueue() {
         return new Queue(apiserverProperties.getQueueName(), true, false, false);
     }
 
     @Bean
-    public TopicExchange exchange() {
+    public TopicExchange auditserverEchange() {
         return new TopicExchange(apiserverProperties.getExchangeName());
     }
 
@@ -60,37 +60,6 @@ public class AMPQConfiguration {
         template.setMessageConverter(messageConverter);
 
         return template;
-    }
-
-    @Bean
-    public RabbitAdmin ampqAdmin(ConnectionFactory connectionFactory) {
-        return new RabbitAdmin(connectionFactory);
-    }
-
-    @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("#");
-    }
-
-    // This should not be here... but for now it will do :/
-    @Bean
-    public ApplicationRunner initializeRabbitMQ(RabbitAdmin rabbitAdmin, Queue queue, TopicExchange exchange) {
-        return args -> {
-            // make the queue HA (mirrored)
-            // rabbitmqctl set_policy ha-all "^ha\." '{"ha-mode":"all"}'
-            rabbitAdmin.declareQueue(queue);
-
-            rabbitAdmin.declareExchange(exchange);
-
-            Binding apiServerBinding = BindingBuilder.bind(queue).to(exchange).with("#");
-            rabbitAdmin.declareBinding(apiServerBinding);
-
-            Queue pulseQueue = new Queue("ha.pulse-queue", true, false, false);
-
-            rabbitAdmin.declareQueue(pulseQueue);
-            Binding pulseBinding = BindingBuilder.bind(pulseQueue).to(exchange).with("#");
-            rabbitAdmin.declareBinding(pulseBinding);
-        };
     }
 
 

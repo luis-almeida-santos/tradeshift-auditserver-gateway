@@ -2,6 +2,7 @@ version: '3'
 
 services:
   rabbit1:
+    container_name: rabbit1
     image: bijukunjummen/rabbitmq-server:3.6.10
     hostname: rabbit1
     ports:
@@ -10,7 +11,10 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - ./config/rabbitmq:/rabbitmq-scripts:ro
   rabbit2:
+    container_name: rabbit2
     image: bijukunjummen/rabbitmq-server:3.6.10
     hostname: rabbit2
     links:
@@ -22,6 +26,7 @@ services:
         - "5673:5672"
         - "15673:15672"
   rabbit3:
+    container_name: rabbit3
     image: bijukunjummen/rabbitmq-server:3.6.10
     hostname: rabbit3
     links:
@@ -34,9 +39,9 @@ services:
       - "5674:5672"
       - "15674:15672"
   haproxy:
-    name: haproxy
+    container_name: haproxy
     image: haproxy:1.7-alpine
     ports:
-      - "65000:65000"
+      - "8080:8080"
     volumes:
       -  ./config/haproxy:/usr/local/etc/haproxy:ro

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,12 +35,12 @@ public class RestController {
     @PostMapping("/rest/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void addLog(@PathVariable("id") String id, InputStream input) throws IOException {
+    public void addLog(@PathVariable("id") String id, HttpEntity<String> input) throws IOException {
 
-        log.info("request received: {}", id);
+        log.debug("request received: {}", id);
 
-        byte[] inputData = IOUtils.toByteArray(decodeIfRequired(input));
-        AuditServerGatewayEvent gatewayEvent = new AuditServerGatewayEvent(id, new String(inputData));
+        String event = decodeIfRequired(input.getBody());
+        AuditServerGatewayEvent gatewayEvent = new AuditServerGatewayEvent(id, event);
         String routingKey = "";
         rabbitTemplate.convertAndSend(exchange.getName(), routingKey, gatewayEvent);
     }
@@ -61,18 +62,13 @@ public class RestController {
      * @param body non-null Json object that contain either an quoted string or an Json object.
      * @return input stream of Json object
      */
-    private InputStream decodeIfRequired(InputStream body) {
-        try {
-            Base64.Decoder b64Decoder = Base64.getDecoder();
-            final byte[] event = IOUtils.toByteArray(body);
-            // If the byte array contains quotes at start and end, Base 64 decode the sliced the array and wrap the
-            // decoded array.
-            if (event.length > 2 && event[0] == '"' && event[event.length - 1] == '"') {
-                return new ByteArrayInputStream(b64Decoder.decode(Arrays.copyOfRange(event, 1, event.length - 1)));
-            }
-            return new ByteArrayInputStream(event);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to decode inbound audit log message", e);
+    private String decodeIfRequired(String body) {
+        Base64.Decoder b64Decoder = Base64.getDecoder();
+        // If the byte array contains quotes at start and end, Base 64 decode the sliced the array and wrap the
+        // decoded array.
+        if (body.length() > 2 && body.charAt(0) == '"' && body.charAt(body.length() - 1) == '"') {
+            return new String(b64Decoder.decode(body.substring(1,body.length())));
         }
+        return body;
     }
 }
