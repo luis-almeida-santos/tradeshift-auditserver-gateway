@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  rabbit1:
+    image: bijukunjummen/rabbitmq-server:3.6.10
+    hostname: rabbit1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+  rabbit2:
+    image: bijukunjummen/rabbitmq-server:3.6.10
+    hostname: rabbit2
+    links:
+      - rabbit1
+    environment:
+     - CLUSTERED=true
+     - CLUSTER_WITH=rabbit1
+    ports:
+        - "5673:5672"
+        - "15673:15672"
+  rabbit3:
+    image: bijukunjummen/rabbitmq-server:3.6.10
+    hostname: rabbit3
+    links:
+      - rabbit1
+      - rabbit2
+    environment:
+     - CLUSTERED=true
+     - CLUSTER_WITH=rabbit1
+    ports:
+      - "5674:5672"
+      - "15674:15672"
+  haproxy:
+    name: haproxy
+    image: haproxy:1.7-alpine
+    ports:
+      - "65000:65000"
+    volumes:
+      -  ./config/haproxy:/usr/local/etc/haproxy:ro
