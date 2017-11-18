@@ -3,7 +3,7 @@
 for i in `seq 1 $1`; do
 
     id=`uuidgen`
-    echo "{'a-very-cool-piece-of-data': 'data # $id-$i'}" | http POST http://localhost:65000/rest/$id
+    echo "{'a-very-cool-piece-of-data': 'data # $id-$i'}" | http POST http://localhost:8397/rest/$id
 
     echo -n "."
 
