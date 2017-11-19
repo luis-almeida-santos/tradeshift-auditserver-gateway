@@ -1,6 +1,5 @@
 target
-
-.iml
-
+*.iml
 bin
 jmeter.log
+.idea
