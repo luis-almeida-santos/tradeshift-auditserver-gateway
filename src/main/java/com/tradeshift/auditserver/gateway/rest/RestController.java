@@ -2,7 +2,6 @@ package com.tradeshift.auditserver.gateway.rest;
 
 import com.tradeshift.auditserver.gateway.model.AuditServerGatewayEvent;
 import lombok.AllArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.TopicExchange;
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Base64;
 
 
@@ -67,7 +63,7 @@ public class RestController {
         // If the byte array contains quotes at start and end, Base 64 decode the sliced the array and wrap the
         // decoded array.
         if (body.length() > 2 && body.charAt(0) == '"' && body.charAt(body.length() - 1) == '"') {
-            return new String(b64Decoder.decode(body.substring(1,body.length())));
+            return new String(b64Decoder.decode(body.substring(1, body.length())));
         }
         return body;
     }

@@ -37,7 +37,8 @@ public class AuditServerGatewayEventDispatcher {
 
         HttpStatus responseStatus = response.getStatusCode();
 
-        if (!responseStatus.is2xxSuccessful() ) {
+        if (!responseStatus.is2xxSuccessful()) {
+            // We know that audit server responds with a 204 :)
             throw new DispatchException(responseStatus, response.getBody());
         }
     }

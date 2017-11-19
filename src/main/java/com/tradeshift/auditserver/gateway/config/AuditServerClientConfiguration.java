@@ -17,7 +17,7 @@ public class AuditServerClientConfiguration {
     private final AuditServerGatewayProperties auditServerGatewayProperties;
 
     @Bean
-    public RestTemplate restTemplate(){
+    public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
 
         return restTemplate;
