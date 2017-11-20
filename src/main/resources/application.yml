@@ -34,5 +34,5 @@ management:
 logging:
   level:
     root: INFO
-    org.springframework: DEBUG
+    org.springframework: INFO
     com.tradeshift: DEBUG
