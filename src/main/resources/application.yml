@@ -1,0 +1,38 @@
+server:
+  port: 8397
+
+auditserver-gateway:
+  queueName: ha.auditserver_queue
+  exchangeName: auditserver-gateway-exchange
+  auditServerURL: http://localhost:65000/rest/events/{id}
+  auditServerTimeout: 5000
+  consumerCount: 2-10
+
+spring:
+  rabbitmq:
+    addresses: 127.0.0.1:5672,127.0.0.1:5673,127.0.0.1:5674
+    username: admin
+    password: admin
+
+endpoints:
+  default:
+    enabled: false
+  health:
+    enabled: true
+  trace:
+    enabled: true
+  metrics:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      base-path: /rest/management
+  info.git.mode: full
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    com.tradeshift: DEBUG
